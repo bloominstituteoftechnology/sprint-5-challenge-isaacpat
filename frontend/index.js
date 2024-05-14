@@ -1,21 +1,34 @@
+
+
 async function sprintChallenge5() { // Note the async keyword so you can use `await` inside sprintChallenge5
   // 👇 WORK ONLY BELOW THIS LINE 👇
   // 👇 WORK ONLY BELOW THIS LINE 👇
   // 👇 WORK ONLY BELOW THIS LINE 👇
 
   // 👇 ==================== TASK 1 START ==================== 👇
+ 
 
   // 🧠 Use Axios to GET learners and mentors.
   // ❗ Use the variables `mentors` and `learners` to store the data.
   // ❗ Use the await keyword when using axios.
-
-  let mentors = [] // fix this
-  let learners = [] // fix this
+  
+  //let mentors = [] // fix this
+ // let learners = [] // fix this
+  
+ const learnersResponse = await axios.get('http://localhost:3003/api/learners');
+ const learners = learnersResponse.data;
+ 
+ // Fetch data from Endpoint B (mentors)
+ const mentorsResponse = await axios.get('http://localhost:3003/api/mentors');
+ const mentors = mentorsResponse.data;
+ 
+  
+  
+   
 
   // 👆 ==================== TASK 1 END ====================== 👆
 
   // 👇 ==================== TASK 2 START ==================== 👇
-
   // 🧠 Combine learners and mentors.
   // ❗ At this point the learner objects only have the mentors' IDs.
   // ❗ Fix the `learners` array so that each learner ends up with this exact structure:
@@ -27,8 +40,21 @@ async function sprintChallenge5() { // Note the async keyword so you can use `aw
   //     "Bill Gates",
   //     "Grace Hopper"
   //   ]`
-  // }
+  learners.forEach(learner => {
+    // Map each mentor ID to their name
+    const mentorNames = learner.mentors.map(mentorId => {
+      // Find the mentor object with the corresponding ID
+      const mentor = mentors.find(mentor => mentor.id === mentorId);
+      // Return the mentor's full name
+      return `${mentor.firstName} ${mentor.lastName}`;
 
+    });
+    // Update the learner object to include mentor names
+    learner.mentors = mentorNames;
+  });
+  
+
+  
   // 👆 ==================== TASK 2 END ====================== 👆
 
   const cardsContainer = document.querySelector('.cards')
@@ -48,16 +74,59 @@ async function sprintChallenge5() { // Note the async keyword so you can use `aw
     // ❗ Inspect the mock site closely to understand what the initial texts and classes look like!
 
     const card = document.createElement('div')
+    
+
     const heading = document.createElement('h3')
+    
+
     const email = document.createElement('div')
+    
+
     const mentorsHeading = document.createElement('h4')
+    
+    
     const mentorsList = document.createElement('ul')
+   card.classList.add('card');
+  heading.classList.add('name');
+  heading.textContent = learner.fullName;
+  email.classList.add('email');
+  email.textContent = learner.email;
+  mentorsHeading.classList.add('closed');
+  mentorsHeading.textContent = 'Mentors';
+  mentorsList.classList.add('mentor-list','hidden'); 
+  mentorsList.style.display = 'none'; 
 
-    // 👆 ==================== TASK 3 END ====================== 👆
+  // Inside the loop where mentors are added to the <ul> element
+learner.mentors.forEach(mentor => {
+  const mentorItem = document.createElement('li');
+  mentorItem.textContent = mentor;
+  mentorsList.appendChild(mentorItem);
+});
 
-    // 👆 WORK ONLY ABOVE THIS LINE 👆
-    // 👆 WORK ONLY ABOVE THIS LINE 👆
-    // 👆 WORK ONLY ABOVE THIS LINE 👆
+
+  // Append elements to card
+  card.appendChild(heading);
+  card.appendChild(email);
+  card.appendChild(mentorsHeading);
+  card.appendChild(mentorsList);
+
+  // Append card to cards container
+  cardsContainer.appendChild(card);
+
+  
+
+  
+  mentorsHeading.addEventListener('click', () => {
+    mentorsHeading.classList.toggle('closed');
+   
+  });
+
+
+   // 👆 ==================== TASK 3 END ====================== 👆
+
+    //👆 WORK ONLY ABOVE THIS LINE 👆
+   // 👆 WORK ONLY ABOVE THIS LINE 👆
+   // 👆 WORK ONLY ABOVE THIS LINE 👆
     card.appendChild(mentorsList)
     card.dataset.fullName = learner.fullName
     cardsContainer.appendChild(card)
@@ -103,6 +172,8 @@ async function sprintChallenge5() { // Note the async keyword so you can use `aw
   const currentYear = new Date().getFullYear()
   footer.textContent = `© BLOOM INSTITUTE OF TECHNOLOGY ${currentYear}`
 }
+
+
 
 // ❗ DO NOT CHANGE THIS CODE. WORK ONLY INSIDE TASKS 1, 2, 3
 if (typeof module !== 'undefined' && module.exports) module.exports = { sprintChallenge5 }
